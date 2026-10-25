@@ -148,3 +148,18 @@ The Databricks workflow includes:
 ## Data Privacy
 
 This project is intended for learning and portfolio demonstration. Only synthetic data should be committed to the repository. Database credentials, local backups, and other sensitive configuration files must remain outside version control.
+
+## Dashboard Screenshot
+
+The published Databricks dashboard provides an overview of healthcare billing performance, including collections trends, claim status, payer billing, and denial categories.
+
+![Healthcare Billing Analytics Dashboard](docs/screenshots/healthcare-billing-dashboard.png)
+
+## SQL Reporting Views
+
+The Databricks SQL view definitions used for reporting are included in the [`sql/`](sql/) directory:
+
+- [`monthly_collections.sql`](sql/monthly_collections.sql) — monthly payment counts, total collections, and average payment amounts.
+- [`denial_summary.sql`](sql/denial_summary.sql) — denial counts grouped by period, category, code, and status.
+- [`payer_performance.sql`](sql/payer_performance.sql) — payer-level claim counts, billed and allowed amounts, patient responsibility, and allowed-to-billed percentage.
+- [`claim_ar.sql`](sql/claim_ar.sql) — claim-level reporting combining claim, encounter, and payer details.
