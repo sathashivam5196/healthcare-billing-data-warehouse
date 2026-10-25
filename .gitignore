@@ -1,0 +1,36 @@
+﻿# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Database backups and dumps
+backups/
+*.backup
+*.dump
+*.sql.gz
+
+# Exported synthetic datasets
+data/
+databricks_export/
+*.csv
+
+# Local logs and temporary files
+*.log
+*.tmp
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
