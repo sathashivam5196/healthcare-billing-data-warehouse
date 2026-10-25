@@ -34,6 +34,9 @@ An end-to-end data engineering and analytics portfolio project built using synth
 - [Architecture Diagram](docs/architecture.md) — visual overview of the pipeline from Python through PostgreSQL and Databricks to the analytics dashboard.
 - [Project Walkthrough](docs/project-walkthrough.md) — step-by-step explanation of the implementation, dataset, SQL reporting views, and validation results.
 
+- [Data Model Diagram (ERD)](docs/data-model.md) — shows the relationships between patients, encounters, claims, payers, payments, denials, and adjustments.
+docs/data-model.md
+
 ## Data Model
 
 The project contains nine warehouse entities:
