@@ -28,6 +28,12 @@ An end-to-end data engineering and analytics portfolio project built using synth
 8. Develop reporting views for collections, denials, payer performance, and claim-level financial analysis.
 9. Build and publish a Healthcare Billing Analytics Dashboard.
 
+
+## Project Documentation
+
+- [Architecture Diagram](docs/architecture.md) — visual overview of the pipeline from Python through PostgreSQL and Databricks to the analytics dashboard.
+- [Project Walkthrough](docs/project-walkthrough.md) — step-by-step explanation of the implementation, dataset, SQL reporting views, and validation results.
+
 ## Data Model
 
 The project contains nine warehouse entities:
