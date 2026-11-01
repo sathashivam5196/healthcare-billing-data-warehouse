@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: healthcare-billing-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - healthcare_billing_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: healthcare-billing-app
+    env_file:
+      - .env
+    environment:
+      PGHOST: postgres
+      PGPORT: "5432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  healthcare_billing_data:

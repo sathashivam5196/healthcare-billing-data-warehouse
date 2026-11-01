@@ -1,0 +1,36 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Git metadata
+.git
+.gitignore
+
+# Python virtual environments
+.venv
+venv
+env
+__pycache__
+*.py[cod]
+
+# Test and quality caches
+.pytest_cache
+.ruff_cache
+.mypy_cache
+
+# Database files and backups
+*.sql.gz
+*.dump
+*.backup
+*.bak
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode

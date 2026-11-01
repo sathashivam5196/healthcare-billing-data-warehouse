@@ -1,4 +1,4 @@
-import getpass
+import os
 import random
 from datetime import date, timedelta
 from decimal import Decimal
@@ -23,13 +23,18 @@ def random_date(start, end):
 
 
 def main():
-    password = getpass.getpass("PostgreSQL password: ")
+    password = os.getenv("PGPASSWORD")
+
+    if not password:
+        raise RuntimeError(
+            "PGPASSWORD is not set. Configure the database environment variables."
+        )
 
     with psycopg.connect(
-        host="localhost",
-        port=5432,
-        dbname="healthcare_billing",
-        user="postgres",
+        host=os.getenv("PGHOST", "localhost"),
+        port=int(os.getenv("PGPORT", "5432")),
+        dbname=os.getenv("PGDATABASE", "healthcare_billing"),
+        user=os.getenv("PGUSER", "postgres"),
         password=password,
     ) as conn:
         with conn.cursor() as cur:

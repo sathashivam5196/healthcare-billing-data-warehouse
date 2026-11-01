@@ -34,3 +34,6 @@ databricks_export/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Trivy security scan reports
+trivy-report*.json
