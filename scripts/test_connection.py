@@ -1,4 +1,5 @@
-﻿import os
+import os
+
 import psycopg
 
 host = os.getenv("PGHOST", "localhost")
@@ -22,9 +23,7 @@ try:
         connect_timeout=10,
     ) as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT current_database(), current_user, version();"
-            )
+            cur.execute("SELECT current_database(), current_user, version();")
             db_name, db_user, version = cur.fetchone()
 
             print("\nConnection successful!")
@@ -41,7 +40,7 @@ try:
             schemas = ", ".join(row[0] for row in cur.fetchall())
             print("Project schemas:", schemas)
 
-except psycopg.OperationalError:
+except psycopg.OperationalError as err:
     raise SystemExit(
         "Connection failed. Check PostgreSQL availability and environment settings."
-    )
+    ) from err

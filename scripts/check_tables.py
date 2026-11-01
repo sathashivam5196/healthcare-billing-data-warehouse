@@ -1,5 +1,7 @@
-﻿import os
+import os
+
 import psycopg
+
 with psycopg.connect(
     host=os.getenv("PGHOST", "localhost"),
     port=int(os.getenv("PGPORT", "5432")),
@@ -20,4 +22,3 @@ with psycopg.connect(
         print(f"\nWarehouse tables found: {len(tables)}")
         for (table_name,) in tables:
             print(f" - {table_name}")
-

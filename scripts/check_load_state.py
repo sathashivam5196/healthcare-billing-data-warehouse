@@ -1,5 +1,7 @@
-﻿import os
+import os
+
 import psycopg
+
 with psycopg.connect(
     host=os.getenv("PGHOST", "localhost"),
     port=int(os.getenv("PGPORT", "5432")),
@@ -20,4 +22,3 @@ with psycopg.connect(
         """)
         for table_name, row_count in cur.fetchall():
             print(f"{table_name}: {row_count:,}")
-
