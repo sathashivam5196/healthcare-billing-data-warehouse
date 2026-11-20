@@ -46,7 +46,7 @@ jobs:
       - name: Start PostgreSQL
         run: docker compose up -d postgres
 
-      - name: Verify application database connectivity
+      - name: Verify PostgreSQL readiness
         run: |
           ready=false
 
@@ -63,6 +63,8 @@ jobs:
             exit 1
           fi
 
+      - name: Verify application database connectivity
+        run: |
           docker compose run --rm --no-deps app python -c '
           import os
           import psycopg
@@ -79,6 +81,38 @@ jobs:
               ).fetchone()[0])
               print("Docker application connectivity: SUCCESS")
           '
+
+      - name: Initialize warehouse schema
+        run: |
+          docker compose exec -T postgres psql \
+            -v ON_ERROR_STOP=1 \
+            -U postgres \
+            -d healthcare_billing \
+            -c "CREATE SCHEMA IF NOT EXISTS warehouse;"
+
+          docker compose exec -T postgres psql \
+            -v ON_ERROR_STOP=1 \
+            -U postgres \
+            -d healthcare_billing \
+            < database/init/01_warehouse_schema.sql
+
+      - name: Load provider and payer reference data
+        run: |
+          docker compose exec -T postgres psql \
+            -v ON_ERROR_STOP=1 \
+            -U postgres \
+            -d healthcare_billing \
+            < database/init/02_reference_data.sql
+
+      - name: Generate synthetic healthcare billing data
+        run: |
+          docker compose run --rm --no-deps app \
+            python -m scripts.generate_synthetic_data
+
+      - name: Run healthcare billing data quality checks
+        run: |
+          docker compose run --rm --no-deps app \
+            python -m scripts.check_data_quality
 
       - name: Scan Docker image for vulnerabilities
         uses: aquasecurity/trivy-action@0.35.0
