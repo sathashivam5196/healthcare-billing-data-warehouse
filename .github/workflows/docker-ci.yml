@@ -1,0 +1,105 @@
+
+name: Docker CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker-ci:
+    name: Build, Validate and Scan Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Create CI environment file
+        run: |
+          cat > .env <<'EOF'
+          POSTGRES_DB=healthcare_billing
+          POSTGRES_USER=postgres
+          POSTGRES_PASSWORD=ci_test_password
+          PGHOST=localhost
+          PGPORT=5432
+          PGDATABASE=healthcare_billing
+          PGUSER=postgres
+          PGPASSWORD=ci_test_password
+          EOF
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config --quiet
+
+      - name: Build Docker application image
+        run: docker compose build app
+
+      - name: Start PostgreSQL
+        run: docker compose up -d postgres
+
+      - name: Verify application database connectivity
+        run: |
+          ready=false
+
+          for _ in {1..30}; do
+            if docker compose exec -T postgres pg_isready -U postgres -d healthcare_billing; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "$ready" != "true" ]; then
+            echo "PostgreSQL did not become ready within 60 seconds."
+            exit 1
+          fi
+
+          docker compose run --rm --no-deps app python -c '
+          import os
+          import psycopg
+
+          with psycopg.connect(
+              host=os.environ["PGHOST"],
+              port=os.environ["PGPORT"],
+              dbname=os.environ["PGDATABASE"],
+              user=os.environ["PGUSER"],
+              password=os.environ["PGPASSWORD"],
+          ) as conn:
+              print("Database:", conn.execute(
+                  "SELECT current_database()"
+              ).fetchone()[0])
+              print("Docker application connectivity: SUCCESS")
+          '
+
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: image
+          image-ref: healthcare-billing-data-warehouse-app:latest
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          exit-code: '0'
+          format: table
+
+      - name: Fail if critical vulnerabilities are found
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: image
+          image-ref: healthcare-billing-data-warehouse-app:latest
+          scanners: vuln
+          severity: CRITICAL
+          exit-code: '1'
+          format: table
+
+      - name: Stop PostgreSQL
+        if: always()
+        run: docker compose down
