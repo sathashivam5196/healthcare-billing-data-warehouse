@@ -1,4 +1,3 @@
-
 import os
 import sys
 
@@ -194,13 +193,16 @@ def main() -> int:
     failed_checks = 0
 
     try:
-        with psycopg.connect(
-            host=os.getenv("PGHOST", "localhost"),
-            port=int(os.getenv("PGPORT", "5432")),
-            dbname=os.getenv("PGDATABASE", "healthcare_billing"),
-            user=os.getenv("PGUSER", "postgres"),
-            password=password,
-        ) as conn, conn.transaction():
+        with (
+            psycopg.connect(
+                host=os.getenv("PGHOST", "localhost"),
+                port=int(os.getenv("PGPORT", "5432")),
+                dbname=os.getenv("PGDATABASE", "healthcare_billing"),
+                user=os.getenv("PGUSER", "postgres"),
+                password=password,
+            ) as conn,
+            conn.transaction(),
+        ):
             conn.execute("SET TRANSACTION READ ONLY")
 
             print("\nHealthcare Billing Data Quality Results")
@@ -215,10 +217,7 @@ def main() -> int:
                     status = "FAIL"
                     failed_checks += 1
 
-                print(
-                    f"{status:<5} | {check_name}: "
-                    f"{mismatch_count:,} mismatches"
-                )
+                print(f"{status:<5} | {check_name}: {mismatch_count:,} mismatches")
 
         print("=" * 60)
         print(f"Total checks: {len(CHECKS)}")
